@@ -94,6 +94,60 @@ export function startServer() {
     res.redirect('/');
   });
 
+  app.get('/results', async (req, res) => {
+    const results = await db.all('SELECT * FROM photos ORDER BY votes DESC LIMIT 10');
+    let photosHTML = `
+      <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Sústredko or not</title>
+          </head>
+
+          <style>
+            html, body {
+              height: 100%;
+            }
+
+            html {
+              display: table;
+              margin: auto;
+            }
+
+            body {
+              display: table-cell;
+              vertical-align: middle;
+            }
+
+            h2 {
+              text-align: center;
+            }
+          </style>
+          <body>`;
+
+    results.forEach((photo, index) => {
+      let voteWord;
+      if (photo.votes === 0) {
+        voteWord = 'hlasov';
+      } else if (photo.votes === 1) {
+        voteWord = 'hlas';
+      } else if (photo.votes === 2 || photo.votes === 3) {
+        voteWord = 'hlasy';
+      } else {
+        voteWord = 'hlasov';
+      }
+      photosHTML += `
+        <div>
+          <h2>${index + 1}. miesto, ${photo.votes} ${voteWord}</h2>
+          <img src='images/${pad(photo.id.toString())}.jpg' />
+        </div>
+      `;
+    });
+
+    photosHTML += '</body></html>';
+
+    res.send(photosHTML);
+  });
+
   Promise.resolve()
     // First, try connect to the database and update its schema to the latest version
     .then(() => db.open('./database.sqlite', {Promise}))
