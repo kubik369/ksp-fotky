@@ -76,6 +76,7 @@ export function startServer() {
 
     if (!vote) {
       res.redirect('/');
+      return;
     }
 
     const row = await db.get('SELECT * FROM photos WHERE id=$pictureID', {$pictureID: vote});
@@ -86,7 +87,7 @@ export function startServer() {
       await db.run(
         'UPDATE photos SET votes = votes + 1 WHERE id=$pictureID',
         {$pictureID: vote}
-      ).exec();
+      );
 
       console.log('[', new Date().toLocaleString(), '] Registered vote for photo ID', vote);
     }
