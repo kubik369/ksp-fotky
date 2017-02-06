@@ -95,7 +95,13 @@ export function startServer() {
   });
 
   app.get('/results', async (req, res) => {
-    const results = await db.all('SELECT * FROM photos ORDER BY votes DESC LIMIT 10');
+    const numberOfResults = req.query.top || 10;
+    if (numberOfResults < 0) {
+      res.send('Invalid number of results');
+    }
+    const results = await db.all(
+      `SELECT * FROM photos ORDER BY votes DESC LIMIT ${numberOfResults}`
+    );
     let photosHTML = `
       <!DOCTYPE html>
         <html>
