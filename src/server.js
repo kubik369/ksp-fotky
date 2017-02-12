@@ -98,6 +98,7 @@ export function startServer() {
     const numberOfResults = req.query.top || 10;
     if (numberOfResults < 0) {
       res.send('Invalid number of results');
+      return;
     }
     const results = await db.all(
       `SELECT * FROM photos ORDER BY votes DESC LIMIT ${numberOfResults}`
